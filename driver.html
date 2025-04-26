@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Driver Location</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Firebase SDK (non-module) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Driver Location</h1>
+  <div id="location"></div>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6_l2tZUDgs_SktXC0mhEuHgBLEZvENBM",
+      authDomain: "lorrytracker-rr.firebaseapp.com",
+      databaseURL: "https://lorrytracker-rr-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "lorrytracker-rr",
+      storageBucket: "lorrytracker-rr.appspot.com",
+      messagingSenderId: "721117238968",
+      appId: "1:721117238968:web:35028a5fa52ac7dfa1064d"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Check if location is available
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        // Display location on the page
+        document.getElementById('location').innerText = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+        // Push the location to Firebase
+        db.ref('driver/location').set({
+          latitude: latitude,
+          longitude: longitude
+        });
+      }, (error) => {
+        alert("Location not available");
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  </script>
+</body>
+</html>
