@@ -1,56 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Driver Live Location Tracker</title>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6_l2tZUDgs_SktXC0mhEuHgBLEZvENBM",
+    authDomain: "lorrytracker-rr.firebaseapp.com",
+    databaseURL: "https://lorrytracker-rr-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "lorrytracker-rr",
+    storageBucket: "lorrytracker-rr.appspot.com",
+    messagingSenderId: "721117238968",
+    appId: "1:721117238968:web:35028a5fa52ac7dfa1064d"
+  };
 
-  <!-- LeafletJS Free Map CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-  <style>
-    #map {
-      height: 90vh;
-      width: 100%;
-    }
-  </style>
-</head>
+  const map = L.map('map').setView([0, 0], 2); // Start zoomed out
 
-<body>
-  <h2>Driver Live Location Tracker</h2>
-  <div id="map"></div>
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+  }).addTo(map);
 
-  <!-- Firebase SDK (ES Modules) -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
-    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js';
+  const marker = L.marker([0, 0]).addTo(map);
 
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyB6_l2tZUDgs_SktXC0mhEuHgBLEZvENBM",
-      authDomain: "lorrytracker-rr.firebaseapp.com",
-      databaseURL: "https://lorrytracker-rr-default-rtdb.asia-southeast1.firebasedatabase.app/",
-      projectId: "lorrytracker-rr",
-      storageBucket: "lorrytracker-rr.appspot.com",
-      messagingSenderId: "721117238968",
-      appId: "1:721117238968:web:35028a5fa52ac7dfa1064d"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    const map = L.map('map').setView([0, 0], 2); // Start zoomed out
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    const marker = L.marker([0, 0]).addTo(map);
-
-    // Firebase Realtime Database listener
-    const locationRef = ref(db, 'driver/location');
-    onValue(locationRef, (snapshot) => {
+  // Poll the Firebase database every 30 seconds
+  setInterval(() => {
+    db.ref('driver/location').once('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const { latitude, longitude } = data;
@@ -58,9 +30,6 @@
         map.setView([latitude, longitude], 15);
       }
     });
-  </script>
+  }, 30000);  // 30 seconds interval
 
-  <!-- LeafletJS Free Map Script -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-</body>
-</html>
+</script>
