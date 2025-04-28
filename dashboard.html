@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lorry Tracker - Dashboard</title>
+
+  <!-- Leaflet.js CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+
+  <style>
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Driver Live Location Tracker</h2>
+<div id="map"></div>
+
+<!-- Leaflet.js JavaScript -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6_l2tZUDgs_SktXC0mhEuHgBLEZvENBM",
+    authDomain: "lorrytracker-rr.firebaseapp.com",
+    databaseURL: "https://lorrytracker-rr-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "lorrytracker-rr",
+    storageBucket: "lorrytracker-rr.appspot.com",
+    messagingSenderId: "721117238968",
+    appId: "1:721117238968:web:35028a5fa52ac7dfa1064d"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Initialize Leaflet Map
+  const map = L.map('map').setView([0, 0], 2); // Default center
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Create a marker
+  const marker = L.marker([0, 0]).addTo(map);
+
+  // Listen for driver's location updates
+  db.ref('driver/location').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const lat = data.latitude;
+      const lng = data.longitude;
+      marker.setLatLng([lat, lng]);
+      map.setView([lat, lng], 15); // Zoom in when location available
+    }
+  });
+</script>
+
+</body>
+</html>
