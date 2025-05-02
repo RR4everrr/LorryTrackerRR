@@ -1,59 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Driver Location</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Firebase SDK (non-module) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-  </style>
+  <title>Driver GPS Sender</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <h1>Driver Location</h1>
-  <div id="location"></div>
+  <h2>Tracking… Please don’t close this page.</h2>
 
   <script>
-    // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyB6_l2tZUDgs_SktXC0mhEuHgBLEZvENBM",
-      authDomain: "lorrytracker-rr.firebaseapp.com",
-      databaseURL: "https://lorrytracker-rr-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "lorrytracker-rr",
-      storageBucket: "lorrytracker-rr.appspot.com",
-      messagingSenderId: "721117238968",
-      appId: "1:721117238968:web:35028a5fa52ac7dfa1064d"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Check if location is available
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-
-        // Display location on the page
-        document.getElementById('location').innerText = `Latitude: ${latitude}, Longitude: ${longitude}`;
-
-        // Push the location to Firebase
-        db.ref('driver/location').set({
-          latitude: latitude,
-          longitude: longitude
-        });
-      }, (error) => {
-        alert("Location not available");
+    function sendLocation(position) {
+      const { latitude, longitude } = position.coords;
+      db.ref("driver1").set({
+        lat: latitude,
+        lng: longitude,
+        timestamp: Date.now()
       });
-    } else {
-      alert("Geolocation is not supported by this browser.");
     }
+
+    function locationError(err) {
+      console.error("Location error:", err.message);
+    }
+
+    setInterval(() => {
+      navigator.geolocation.getCurrentPosition(sendLocation, locationError, {
+        enableHighAccuracy: true
+      });
+    }, 5000);
   </script>
 </body>
 </html>
