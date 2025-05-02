@@ -14,7 +14,7 @@
       authDomain: "lorrytracker-rr.firebaseapp.com",
       databaseURL: "https://lorrytracker-rr-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "lorrytracker-rr",
-      storageBucket: "lorrytracker-rr.firebasestorage.app",
+      storageBucket: "lorrytracker-rr.appspot.com",
       messagingSenderId: "721117238968",
       appId: "1:721117238968:web:35028a5fa52ac7dfa1064d"
     };
@@ -24,6 +24,7 @@
 
     function sendLocation(position) {
       const { latitude, longitude } = position.coords;
+      console.log("Sending location:", latitude, longitude);
       db.ref("driver1").set({
         lat: latitude,
         lng: longitude,
@@ -33,13 +34,18 @@
 
     function locationError(err) {
       console.error("Location error:", err.message);
+      alert("Unable to get location: " + err.message);
     }
 
-    setInterval(() => {
-      navigator.geolocation.getCurrentPosition(sendLocation, locationError, {
-        enableHighAccuracy: true
+    if ("geolocation" in navigator) {
+      navigator.geolocation.watchPosition(sendLocation, locationError, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
       });
-    }, 5000);
+    } else {
+      alert("Geolocation not supported in this browser.");
+    }
   </script>
 </body>
 </html>
